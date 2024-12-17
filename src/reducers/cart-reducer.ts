@@ -18,10 +18,16 @@ export type CartState = {
   cart: CartItem[];
 };
 
+//Inicializar el carrito
+const initialCart = () : CartItem[] => {
+  const localStorageCart = localStorage.getItem('cart')
+  return localStorageCart ? JSON.parse(localStorageCart) : []
+}
+
 //Crear el estado inicial del reducer
 export const initialState: CartState = {
   data: db,
-  cart: [],
+  cart: initialCart(),
 };
 
 //Creando el cart-reducer y definir las acciones
@@ -67,20 +73,45 @@ export const cartReducer = (
   }
 
   if (action.type === "increase-quantity") {
+  
+    const updatedCart = state.cart.map( item => {
+      if(item.id === action.payload.id && item.quantity < MAX_ITEMS) {
+          return {
+              ...item,
+              quantity: item.quantity + 1
+          }
+      }
+      return item
+  })
+
     return {
       ...state,
+      cart: updatedCart
     };
   }
 
   if (action.type === "decrease-quantity") {
+
+    const updatedCart = state.cart.map( item => {
+      if(item.id === action.payload.id && item.quantity > MIN_ITEMS) {
+          return {
+              ...item,
+              quantity: item.quantity - 1
+          }
+      }
+      return item
+  })
     return {
       ...state,
+      cart: updatedCart 
     };
   }
 
   if (action.type === "clear-cart") {
+
     return {
       ...state,
+      cart:[]
     };
   }
   return state;
